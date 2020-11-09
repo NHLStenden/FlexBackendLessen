@@ -4,11 +4,13 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using FlexBackendLessen.Controllers;
+using FlexBackendLessen.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -29,11 +31,23 @@ namespace FlexBackendLessen
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            // services.AddSwaggerGen();
+
+            services.AddDbContext<WebshopContext>(builder =>
+            {
+                builder.UseNpgsql("Host=localhost;Database=webshop;Port=5433;Username=postgres;Password=postgres");
+                builder.EnableSensitiveDataLogging();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WebshopContext db)
         {
+            db.Database.EnsureDeleted();
+            db.Database.EnsureCreated();
+
+            SeedDatabase.Seed(db);
+
             // example of request pipeline
             // app.Use(async (context, next) =>
             // {
@@ -54,7 +68,15 @@ namespace FlexBackendLessen
             // if (env.IsDevelopment())
             // {
             //     app.UseDeveloperExceptionPage();
-            // }
+
+            // app.UseSwagger();
+            //
+            // // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // // specifying the Swagger JSON endpoint.
+            // app.UseSwaggerUI(c =>
+            // {
+            //     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            // });
 
             app.UseHttpsRedirection();
 
