@@ -31,52 +31,40 @@ namespace FlexBackendLessen
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            // services.AddSwaggerGen();
 
             services.AddDbContext<WebshopContext>(builder =>
             {
                 builder.UseNpgsql("Host=localhost;Database=webshop;Port=5433;Username=postgres;Password=postgres");
                 builder.EnableSensitiveDataLogging();
             });
+
+            services.AddSwaggerGen();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, WebshopContext db)
         {
+            //RequestPipelineExample(app, env);
+
             db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
 
             SeedDatabase.Seed(db);
 
-            // example of request pipeline
-            // app.Use(async (context, next) =>
-            // {
-            //     string url = context.Request.Path.Value.ToLower();
-            //     if (url == "/weatherforecast")
-            //     {
-            //         WeatherForecastController wfc = new WeatherForecastController(null);
-            //         await context.Response.WriteAsync(JsonSerializer.Serialize(wfc.Get()));
-            //     }
-            // });
-            //
-            // app.Run(async context =>
-            // {
-            //     await context.Response.WriteAsync("Joris hier");
-            //     await context.Response.CompleteAsync();
-            // });
-            //
-            // if (env.IsDevelopment())
-            // {
-            //     app.UseDeveloperExceptionPage();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
 
-            // app.UseSwagger();
-            //
-            // // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
-            // // specifying the Swagger JSON endpoint.
-            // app.UseSwaggerUI(c =>
-            // {
-            //     c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            // });
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
+            // specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+            });
 
             app.UseHttpsRedirection();
 
@@ -85,6 +73,28 @@ namespace FlexBackendLessen
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        }
+
+        private void RequestPipelineExample(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            //example of request pipeline
+            app.Use(async (context, next) =>
+            {
+                string url = context.Request.Path.Value.ToLower();
+                if (url == "/weatherforecast")
+                {
+                    //WeatherForecastController wfc = new WeatherForecastController(null);
+                    //await context.Response.WriteAsync(JsonSerializer.Serialize(wfc.Get()));
+                }
+            });
+
+            app.Run(async context =>
+            {
+                await context.Response.WriteAsync("Joris hier");
+                await context.Response.CompleteAsync();
+            });
+
+
         }
     }
 }
