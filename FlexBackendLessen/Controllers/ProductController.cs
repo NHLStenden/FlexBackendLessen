@@ -14,18 +14,19 @@ namespace FlexBackendLessen.Controllers
     public partial class ProductController : ControllerBase
     {
         private readonly ILogger<ProductController> _logger;
-        private readonly WebshopContext _db;
+        private readonly IProductRepository _productRepository;
 
-        public ProductController(ILogger<ProductController> logger, WebshopContext db)
+
+        public ProductController(ILogger<ProductController> logger, IProductRepository productRepository )
         {
             _logger = logger;
-            _db = db;
+            _productRepository = productRepository;
         }
 
         [HttpGet]
         public IEnumerable<Product> Get()
         {
-            return _db.Products.Include(x => x.Category);
+            return _productRepository.GetProductWithCategories();
         }
 
         [HttpPost]
@@ -33,8 +34,7 @@ namespace FlexBackendLessen.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Products.Add(product);
-                _db.SaveChanges();
+                _productRepository.Add(product);
                 return Created($"Detail?productId=" +product.ProductId, product);
             }
 

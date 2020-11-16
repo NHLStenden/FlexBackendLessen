@@ -30,6 +30,14 @@ namespace FlexBackendLessen
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // services.Add(new ServiceDescriptor(typeof(IMyLogger), typeof(MyLogger), ServiceLifetime.Transient));
+            // services.Add(new ServiceDescriptor(typeof(IEngine), typeof(Engine), ServiceLifetime.Scoped));
+            // services.Add(new ServiceDescriptor(typeof(Car), typeof(Car), ServiceLifetime.Scoped));
+
+
+            services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+
             services.AddControllers();
 
             services.AddDbContext<WebshopContext>(builder =>
