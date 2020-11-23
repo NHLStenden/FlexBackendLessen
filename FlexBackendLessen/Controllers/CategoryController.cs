@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using FlexBackendLessen.Models;
+using FlexBackendLessen.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FlexBackendLessen.Controllers
